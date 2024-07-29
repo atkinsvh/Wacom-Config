@@ -7,8 +7,10 @@ clients = set()
 async def register(websocket):
     clients.add(websocket)
     try:
+        print(f"New client connected: {websocket.remote_address}")
         await websocket.wait_closed()
     finally:
+        print(f"Client disconnected: {websocket.remote_address}")
         clients.remove(websocket)
 
 async def screen_stream(websocket, path):
@@ -37,4 +39,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
