@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        #video {
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screen Stream</h1>
+    <video id="video" autoplay controls></video>
+    <p id="status">Connecting to the WebSocket server...</p>
+
+    <script>
+        const serverUrl = 'ws://localhost:8765'; // Ensure this matches the WebSocket server address and port
+        const video = document.getElementById('video');
+        const status = document.getElementById('status');
+
+        const socket = new WebSocket(serverUrl);
+        socket.binaryType = 'arraybuffer';
+
+        socket.onopen = function() {
+            console.log('Connected to the WebSocket server');
+            status.textContent = 'Connected to the WebSocket server';
+        };
+
+        socket.onmessage = function(event) {
+            const blob = new Blob([event.data], { type: 'video/mp2t' });
+            const url = URL.createObjectURL(blob);
+            video.src = url;
+            video.play();
+        };
+
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+            status.textContent = 'WebSocket error: ' + error.message;
+        };
+
+        socket.onclose = function() {
+            console.log('Disconnected from the WebSocket server');
+            status.textContent = 'Disconnected from the WebSocket server';
+        };
+    </script>
+</body>
+</html>
+
