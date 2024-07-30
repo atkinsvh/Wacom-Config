@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screen Stream</title>
+    <title>GStreamer WebSocket Stream</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
         h1 {
             color: #333;
         }
-        #video {
+        video {
             border: 1px solid #ccc;
             width: 80%;
             max-width: 800px;
@@ -32,8 +32,8 @@
     </style>
 </head>
 <body>
-    <h1>Screen Stream</h1>
-    <video id="video" controls></video>
+    <h1>GStreamer WebSocket Stream</h1>
+    <video id="video" controls autoplay></video>
     <p id="status">Connecting to the WebSocket server...</p>
 
     <script>
@@ -57,6 +57,7 @@
                 };
 
                 socket.onmessage = function(event) {
+                    console.log(`Received frame of size ${event.data.byteLength} bytes`);
                     sourceBuffer.appendBuffer(new Uint8Array(event.data));
                 };
 
