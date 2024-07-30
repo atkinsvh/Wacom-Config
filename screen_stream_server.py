@@ -18,7 +18,7 @@ async def screen_stream(websocket, path):
 
 async def relay_stream():
     process = subprocess.Popen(
-        ['ffmpeg', '-f', 'mpegts', '-i', 'udp://localhost:12345', '-c', 'copy', '-f', 'mpegts', 'pipe:1'],
+        ['ffmpeg', '-f', 'avfoundation', '-i', '0', '-vcodec', 'libx264', '-tune', 'zerolatency', '-f', 'mpegts', 'pipe:1'],
         stdout=subprocess.PIPE
     )
 
