@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GStreamer WebSocket Stream</title>
+    <title>Screen Stream</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,49 +32,39 @@
     </style>
 </head>
 <body>
-    <h1>GStreamer WebSocket Stream</h1>
+    <h1>Screen Stream</h1>
     <video id="video" controls autoplay></video>
-    <p id="status">Connecting to the WebSocket server...</p>
+    <p id="status">Connecting to the stream...</p>
 
     <script>
-        const serverUrl = 'ws://192.168.1.41:8765'; // Ensure this matches the WebSocket server address and port
         const video = document.getElementById('video');
         const status = document.getElementById('status');
 
-        if ('MediaSource' in window && MediaSource.isTypeSupported('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')) {
-            const mediaSource = new MediaSource();
-            video.src = URL.createObjectURL(mediaSource);
+        const mediaSource = new MediaSource();
+        video.src = URL.createObjectURL(mediaSource);
 
-            mediaSource.addEventListener('sourceopen', function() {
-                const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
-                
-                const socket = new WebSocket(serverUrl);
-                socket.binaryType = 'arraybuffer';
+        mediaSource.addEventListener('sourceopen', function() {
+            const sourceBuffer = mediaSource.addSourceBuffer('video/mp2t; codecs="avc1.42E01E"');
+            const socket = new WebSocket('ws://192.168.1.41:8765');
 
-                socket.onopen = function() {
-                    console.log('Connected to the WebSocket server');
-                    status.textContent = 'Connected to the WebSocket server';
-                };
+            socket.binaryType = 'arraybuffer';
 
-                socket.onmessage = function(event) {
-                    console.log(`Received frame of size ${event.data.byteLength} bytes`);
-                    sourceBuffer.appendBuffer(new Uint8Array(event.data));
-                };
+            socket.onopen = function() {
+                status.textContent = 'Connected to the stream';
+            };
 
-                socket.onerror = function(error) {
-                    console.error('WebSocket error:', error);
-                    status.textContent = 'WebSocket error: ' + error.message;
-                };
+            socket.onmessage = function(event) {
+                sourceBuffer.appendBuffer(new Uint8Array(event.data));
+            };
 
-                socket.onclose = function() {
-                    console.log('Disconnected from the WebSocket server');
-                    status.textContent = 'Disconnected from the WebSocket server';
-                };
-            });
-        } else {
-            console.error('Unsupported MIME type or codec: video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
-            status.textContent = 'Unsupported MIME type or codec: video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
-        }
+            socket.onerror = function(error) {
+                status.textContent = 'WebSocket error: ' + error.message;
+            };
+
+            socket.onclose = function() {
+                status.textContent = 'Disconnected from the stream';
+            };
+        });
     </script>
 </body>
 </html>
