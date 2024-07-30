@@ -57,6 +57,7 @@
                 };
 
                 socket.onmessage = function(event) {
+                    console.log(`Received frame of size ${event.data.byteLength} bytes`);
                     sourceBuffer.appendBuffer(new Uint8Array(event.data));
                 };
 
