@@ -26,6 +26,7 @@ async def relay_stream():
         frame = process.stdout.read(1024)
         if not frame:
             break
+        print(f"Sending frame of size {len(frame)} bytes")
         await asyncio.gather(*[client.send(frame) for client in clients])
 
 async def main():
